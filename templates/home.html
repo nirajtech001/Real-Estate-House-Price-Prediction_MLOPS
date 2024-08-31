@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>House Price Prediction</title>
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <style>
+      /* Basic reset for consistency */
+      body, h1, h2, p, input, select, button {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+      
+      body {
+          font-family: 'Arimo', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5; /* Same background color for body */
+      }
+      
+      /* Header Styles */
+      header {
+          background-color: #000000;
+          color: #ffffff;
+          padding: 30px;
+          text-align: center;
+          position: fixed;
+          width: 100%;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+      }
+      
+      h1 {
+          font-family: monospace;
+          margin: 0;
+          color: #ffffff; /* White text for header */
+          font-size: 2em; /* Default heading size */
+      }
+      
+      /* Main Content Styles */
+      .container {
+          margin-top: 80px; /* Space for fixed header */
+          padding: 20px;
+          background-color: #f5f5f5; /* Same background color as body */
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Form Styles */
+      form {
+          margin: 20px auto;
+          width: 100%; /* Full width */
+          max-width: 800px; /* Maximum width */
+          background-color: #f5f5f5; /* Same background color as body */
+          padding: 20px;
+          border-radius: 8px;
+      }
+      
+      /* Label and Input Styles */
+      label {
+          display: block;
+          margin: 0 0 0.5em 0;
+          font-weight: bold;
+          text-align: left; /* Left-align labels */
+          font-size: 1em; /* Default label size */
+      }
+      
+      .description {
+          font-size: 0.9em;
+          color: #555;
+          margin-bottom: 10px;
+      }
+      
+      input[type="text"], select {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 15px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+      }
+      
+      /* Button Styles */
+      button {
+          background-color: #0056b3; /* Blue button */
+          color: #ffffff;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 1em;
+          width: 100%;
+      }
+      
+      button:hover {
+          background-color: #004494;
+      }
+      
+      /* Prediction Result Styles */
+      #prediction-result {
+          margin-block: 30px;
+          text-align: center;
+          background-color: #f5f5f5; /* Same background color as body */
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+      }
+      
+      /* Loading Animation Styles */
+      .loading {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: rgba(0, 0, 0, 0.7);
+          color: #ffffff;
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+          z-index: 1001;
+      }
+      
+      .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          border-left: 4px solid #ffffff;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+      }
+      
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+      
+      /* Footer Styles */
+      footer {
+          background-color: #000000;
+          color: #ffffff;
+          padding: 8px;
+          text-align: center;
+          position: fixed;
+          width: 100%;
+          bottom: 0;
+          left: 0;
+      }
+      
+      /* Responsive Styles */
+      @media (max-width: 1024px) {
+          .container {
+              padding: 15px;
+          }
+      
+          form {
+              margin: 10px;
+              width: 100%;
+              max-width: 100%;
+          }
+      
+          input[type="text"], select {
+              padding: 12px;
+              font-size: 16px;
+          }
+      
+          button {
+              padding: 12px;
+              font-size: 18px;
+          }
+      
+          label {
+              font-size: 0.9em; /* Adjust label size for tablets */
+          }
+      }
+      
+      @media (max-width: 768px) {
+          header {
+              padding: 10px;
+          }
+      
+          h1 {
+              font-size: 1.5em; /* Smaller heading size on tablets */
+          }
+      
+          .container {
+              padding: 15px;
+          }
+      
+          form {
+              margin: 10px;
+              width: 100%;
+          }
+      
+          label {
+              font-size: 0.85em;
+          }
+      
+          .description {
+              font-size: 0.8em;
+          }
+      
+          input[type="text"], select {
+              padding: 12px;
+              font-size: 14px;
+          }
+      
+          button {
+              padding: 12px;
+              font-size: 16px;
+          }
+      }
+      
+      @media (max-width: 480px) {
+          header {
+              padding: 8px;
+          }
+      
+          h1 {
+              font-size: 1.2em; /* Even smaller heading size on phones */
+          }
+      
+          .container {
+              margin-top: 70px; /* Adjust padding for very small screens */
+              padding: 10px;
+          }
+      
+          form {
+              margin: 10px;
+              padding: 10px;
+          }
+      
+          label {
+              font-size: 0.8em;
+          }
+      
+          .description {
+              font-size: 0.7em;
+          }
+      
+          input[type="text"], select {
+              padding: 10px;
+              font-size: 12px;
+          }
+      
+          button {
+              padding: 10px;
+              font-size: 14px;
+          }
+      }
+      </style>
+</head>
+
+<body>
+    <header>
+        <h1>Chennai Real Estate House Price Prediction</h1>
+    </header>
+
+    <div class="container">
+        <form id="prediction-form" action="{{ url_for('predict') }}" method="post">
+            <label for="INT_SQFT">Interior Square Feet (INT_SQFT)</label>
+            <div class="description">The interior Sq. Ft of the property.</div>
+            <input type="text" name="INT_SQFT" placeholder="Interior Square Feet (INT_SQFT)" required="required" />
+
+            <label for="DIST_MAINROAD">Distance to Main Road (DIST_MAINROAD)</label>
+            <div class="description">The distance of the property to the main road.</div>
+            <input type="text" name="DIST_MAINROAD" placeholder="Distance to Main Road (DIST_MAINROAD)" required="required" />
+
+            <label for="N_BEDROOM">Number of Bedrooms (N_BEDROOM)</label>
+            <div class="description">The number of bedrooms.</div>
+            <select name="N_BEDROOM" id="N_BEDROOM" required="required">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <label for="N_BATHROOM">Number of Bathrooms (N_BATHROOM)</label>
+            <div class="description">The number of bathrooms.</div>
+            <select name="N_BATHROOM" id="N_BATHROOM" required="required">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+
+            <label for="N_ROOM">Number of Rooms (N_ROOM)</label>
+            <div class="description">Total number of rooms.</div>
+            <select name="N_ROOM" id="N_ROOM" required="required">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+
+            <label for="AREA">Area</label>
+            <div class="description">The property in which the real estate is located.</div>
+            <select name="AREA" id="AREA" required="required">
+                <option value="AREA_Adyar">Adyar</option>
+                <option value="AREA_Anna_Nagar">Anna Nagar</option>
+                <option value="AREA_Chrompet">Chrompet</option>
+                <option value="AREA_KK_Nagar">KK Nagar</option>
+                <option value="AREA_Karapakkam">Karapakkam</option>
+                <option value="AREA_T_Nagar">T Nagar</option>
+                <option value="AREA_Velachery">Velachery</option>
+            </select>
+
+            <label for="SALE_COND">Sale Condition</label>
+            <div class="description">The sale condition of the property.</div>
+            <select name="SALE_COND" id="SALE_COND" required="required">
+                <option value="SALE_COND_AbNormal">AbNormal</option>
+                <option value="SALE_COND_AdjLand">Adjacent Land</option>
+                <option value="SALE_COND_Family">Family</option>
+                <option value="SALE_COND_Normal_Sale">Normal Sale</option>
+                <option value="SALE_COND_Partial">Partial</option>
+            </select>
+
+            <label for="PARK_FACIL">Parking Facility</label>
+            <div class="description">Whether parking facility is available.</div>
+            <select name="PARK_FACIL" id="PARK_FACIL" required="required">
+                <option value="PARK_FACIL_No">No</option>
+                <option value="PARK_FACIL_Yes">Yes</option>
+            </select>
+
+            <label for="BUILDTYPE">Building Type</label>
+            <div class="description">The type of building.</div>
+            <select name="BUILDTYPE" id="BUILDTYPE" required="required">
+                <option value="BUILDTYPE_Commercial">Commercial</option>
+                <option value="BUILDTYPE_House">House</option>
+                <option value="BUILDTYPE_Others">Others</option>
+            </select>
+
+            <label for="UTILITY_AVAIL">Utility Availability</label>
+            <div class="description">Utility availability for the property.</div>
+            <select name="UTILITY_AVAIL" id="UTILITY_AVAIL" required="required">
+                <option value="UTILITY_AVAIL_AllPub">All Public</option>
+                <option value="UTILITY_AVAIL_ELO">Electric Light Only</option>
+                <option value="UTILITY_AVAIL_NoSeWa">No Sewage & Water</option>
+                <option value="UTILITY_AVAIL_NoSewr">No Sewer</option>
+            </select>
+
+            <label for="STREET">Street</label>
+            <div class="description">Type of street.</div>
+            <select name="STREET" id="STREET" required="required">
+                <option value="STREET_Gravel">Gravel</option>
+                <option value="STREET_No_Access">No Access</option>
+                <option value="STREET_Paved">Paved</option>
+            </select>
+            <label for="MZZONE">MZZONE</label>
+            <div class="description">The zone classification of the property.</div>
+            <select name="MZZONE" id="MZZONE" required="required">
+                <option value="MZZONE_A">A</option>
+                <option value="MZZONE_C">C</option>
+                <option value="MZZONE_I">I</option>
+                <option value="MZZONE_RH">RH</option>
+                <option value="MZZONE_RL">RL</option>
+                <option value="MZZONE_RM">RM</option>
+            </select>
+
+            <label for="QS_ROOMS">Quality Score of Rooms (QS_ROOMS)</label>
+            <div class="description">The quality score assigned for rooms based on buyer reviews.</div>
+            <input type="text" name="QS_ROOMS" placeholder="Quality Score of Rooms (QS_ROOMS)" required="required" />
+
+            <label for="QS_BATHROOM">Quality Score of Bathroom (QS_BATHROOM)</label>
+            <div class="description">The quality score assigned for bathrooms based on buyer reviews.</div>
+            <input type="text" name="QS_BATHROOM" placeholder="Quality Score of Bathroom (QS_BATHROOM)" required="required" />
+
+            <label for="QS_BEDROOM">Quality Score of Bedroom (QS_BEDROOM)</label>
+            <div class="description">The quality score assigned for bedrooms based on buyer reviews.</div>
+            <input type="text" name="QS_BEDROOM" placeholder="Quality Score of Bedroom (QS_BEDROOM)" required="required" />
+
+            <label for="QS_OVERALL">Overall Quality Score (QS_OVERALL)</label>
+            <div class="description">The overall quality score assigned for the property.</div>
+            <input type="text" name="QS_OVERALL" placeholder="Overall Quality Score (QS_OVERALL)" required="required" />
+
+            <label for="COMMIS">Commission (COMMIS)</label>
+            <div class="description">The commission paid to the agent.</div>
+            <input type="text" name="COMMIS" placeholder="Commission (COMMIS)" required="required" />
+
+            <button type="submit">Predict</button>
+        </form>
+
+        <div id="prediction-result">
+            <!-- This is where the prediction result will be displayed -->
+            {{ prediction_text }}
+        </div>
+    </div>
+
+    <footer>
+        All rights reserved &copy; Niraj Kumar
+    </footer>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Analyzing and predicting values...</p>
+    </div>
+
+    <script>
+        // Show loading animation on form submission
+        document.getElementById('prediction-form').addEventListener('submit', function() {
+            document.getElementById('loading').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
+
