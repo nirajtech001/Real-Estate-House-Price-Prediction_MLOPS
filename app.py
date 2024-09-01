@@ -6,7 +6,7 @@ import pickle
 app = Flask(__name__)
 
 # Load your model (ensure your model file is in the same directory or provide the correct path)
-regmodel = pickle.load(open('Hmodel.pkl', 'rb'))
+regmodel = pickle.load(open('model1.pkl', 'rb'))
 @app.route('/')
 def home():
     return render_template('home.html')
